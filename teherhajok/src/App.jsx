@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 import './style.css'
 
 function App() { 
-  
+
   const [loggedIn,setLoggedin]=useState(false)
   const [ships, setShips]=useState([])
 
+  useEffect(()=>{
+    getShip()
+  },[1000])
   async function Login(username,password){
     const response=await fetch('http://localhost:3000/login',{
       method: 'POST',
@@ -23,6 +26,7 @@ function App() {
     const result=await response.json()
     sessionStorage.setItem('token',result.token)
     setLoggedin(true)
+    getMyShip()
     alert('Sikeres bejelentkezes')
   }
   async function LogOut(){
@@ -84,42 +88,55 @@ function App() {
   }
   return (
     <>
-        <header class="container">
-          <h1 class="text-center">Hajok</h1>
+        <header className="container">
+          <h1 className="text-center">Hajok</h1>
         </header>
-        <main class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <section class="p-2 m-1 bg-light border rounded">
+        <main className="container">
+            <div className="row">
+                <div className="col-md-8">
+                    <section className="p-2 m-1 bg-light border rounded">
                         <h2>Hajok listaja</h2>
-                        <ul></ul>
+                        <ul>
+                          {ships.map(ship=>{
+                            <li key={ship.id}>{ship.name} {loggedIn? <button onClick={()=>DeleteMyShip(ship.id)} className='btn btn-danger'>Torles</button> :""}</li>
+                          })}
+                        </ul>
                     </section>
                 </div>
-                <div  class="col-md-4">
-                    <section class="p-2 m-1 bg-light border rounded">
-                        <h2 class="text-center">Bejelentkezes</h2>
+                <div  className="col-md-4">
+                  {loggedIn? 
+                    <button type="button" className="btn btn-danger mx-auto d-grid" onClick={LogOut}>Kijelentkezes</button>
+                  : 
+                  <section className="p-2 m-1 bg-light border rounded">
+                    <h2 className="text-center">Bejelentkezes</h2>
+                      <form action="">
+                          <label htmlFor="usernameID" className="form-label">Felhasznalonev</label>
+                          <input type="text" id="usernameID" className="form-control" placeholder="Felhasznalonev"/><br/>
+                          <label htmlFor="passwordID" className="form-label">Jelszo</label>
+                          <input type="password" id="passwordID" className="form-control" placeholder="Felhasznalonev"/><br/>
+                          <button type="button" className="btn btn-success mx-auto d-grid" onClick={()=>Login(usernameID.value,passwordID.value)}>Bejelentkezes</button>
+                      </form>
+                  </section>
+
+                  }
+                    
+                    {loggedIn ? 
+                      <section className="p-2 m-1 bg-light border rounded">
+                        <h2 className="text-center">Hajo hozzaadasa</h2>
                         <form action="">
-                            <label for="username" class="form-label">Felhasznalonev</label>
-                            <input type="text" id="username" class="form-control" placeholder="Felhasznalonev"/><br/>
-                            <label for="password" class="form-label">Jelszo</label>
-                            <input type="password" id="password" class="form-control" placeholder="Felhasznalonev"/><br/>
-                            <button type="button" class="btn btn-success mx-auto d-grid" onclick={Login(username,password)}>Bejelentkezes</button>
+                            <label htmlFor="shipname" className="form-label">Hajo neve</label>
+                            <input type="text" id="shipname" className="form-control" placeholder="Hajpneve"/><br/>
+                            <label htmlFor="shiplength" className="form-label">Hossza</label>
+                            <input type="number" id="shiplength" className="form-control" placeholder="Hajo hossza"/><br/>
+                            <button type="button" className="btn btn-primary mx-auto d-grid" onclick={()=>addShip(shipname.value,shiplength.value)}>letrehozas</button>
                         </form>
-                    </section>
-                    <section class="p-2 m-1 bg-light border rounded">
-                        <h2 class="text-center">Hajo hozzaadasa</h2>
-                        <form action="">
-                            <label for="shipname" class="form-label">Hajo neve</label>
-                            <input type="text" id="shipname" class="form-control" placeholder="Hajpneve"/><br/>
-                            <label for="length" class="form-label">Hossza</label>
-                            <input type="number" id="length" class="form-control" placeholder="Hajo hossza"/><br/>
-                            <button type="button" class="btn btn-primary mx-auto d-grid" onclick={addShip()}>Mentes</button>
-                        </form>
-                    </section>
+                      </section>  
+                    : ""}
+                    
                 </div>
             </div>
         </main>
-        <footer class="text-center">
+        <footer className="text-center">
             Gózon Szabolcs 13.i
         </footer>
         <script src="script.js"></script>
